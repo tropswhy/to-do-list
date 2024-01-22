@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import Input from './ui-kit/Input.vue'
+import Button from './ui-kit/Button.vue'
+import Element from './components/Element.vue'
 import { useMyStore } from './stores/myStore.js'
 
 const value = ref('') // ref - референс для реактивности
@@ -10,54 +12,45 @@ const myStore = useMyStore()
 const changeHandler = (event) => {
     value.value = event.target.value
 }
+
+const clickHandler = () => {
+    myStore.addDo(value.value)
+    value.value = ''
+}
 </script>
 
 <template>
-    <main class="flex flex-col items-center justify-center mt-32 space-y-8">
+    <main class="flex flex-col items-center justify-center mt-32 space-y-5">
         <!-- <input class="input" 
         placeholder="Введите что-нибудь"
         v-model="value"/>  v-model - двустороннее связывавание
         <p>{{ value }}</p> -->
-        <div class="flex space-x-4">
+        <div class="flex space-x-4 mb-6">
             <Input
-                placeholder="ВведитеетидевВ"
+                placeholder="Введите дело"
                 type="text"
-                v-on:keydown.enter="myStore.addDo(value)"
-                @input="changeHandler"/>
-            <button
-                @click="myStore.addDo(value)"
+                :value="value"
+                v-model="value"
+                v-on:keydown.enter="clickHandler"
+                />
+            <Button
+                @click="clickHandler"
                 class="btn">
-                Гена на!
-            </button>
+                Добавить
+            </Button>
         </div>
+        
         <div
             v-for="item in myStore.list"
-            class="element"
+            @click="myStore.removeDo(item.id)"
             :key="item.id">
-            {{ item.title }}
+            
+            <Element :variant="(item.count < 1) ? 'primary' : 'sex'">
+                {{ item.title }}
+            </Element>
         </div>
     </main>
 </template>
 
 <style lang="scss" scoped>
-.btn {
-    width: 100px;
-    height: 50px;
-    padding: 0 10px;
-    background-color: $secondary-color;
-    border-radius: $border-medium;
-    transition-duration: 500ms;
-    &:hover {
-        background-color: $accent-color;
-        box-shadow: 0 0 10px $accent-color;
-    }
-}
-.element {
-    width: 500px;
-    text-align: center;
-    padding: 5px 10px;
-    color: $text-color;
-    background-color: $secondary-color;
-    border-radius: $border-medium;
-}
 </style>
